@@ -71,14 +71,19 @@ public class IntakeSubsystem extends SubsystemBase implements PitCheckable {
         // return new Trigger(() -> MathUtil.isNear(topDistanceToCoral, topSensorInputs.objectDistanceMM, 50));
         return Constants.coral
                 ? new Trigger(() -> MathUtil.isNear(topDistanceToCoral, topSensorInputs.objectDistanceMM, 50))
-                : new Trigger(() -> topSensorInputs.objectDistanceMM <= 270);
+                : new Trigger(() -> topSensorInputs.objectDistanceMM <= 250);
     }
 
     @AutoLogOutput
     public Trigger middleSensorTrigger() {
         return Constants.coral
                 ? new Trigger(() -> MathUtil.isNear(frontTopDistanceToCoral, frontSensorInputs.objectDistanceMM, 30))
-                : new Trigger(() -> frontSensorInputs.objectDistanceMM <= 200);
+                : new Trigger(() -> frontSensorInputs.objectDistanceMM <= 60);
+    }
+
+    @AutoLogOutput
+    public Trigger combinedSensorTrigger() {
+        return middleSensorTrigger().and(bottomSensorTrigger());
     }
 
     @AutoLogOutput
@@ -114,7 +119,7 @@ public class IntakeSubsystem extends SubsystemBase implements PitCheckable {
                                 .andThen(setBottomSensor(true))
                                 .andThen(new PrintCommand("Simulating intake"))
                         : Commands.none())
-                .andThen(runVoltsRoller(-1).until(bottomSensorTrigger()));
+                .andThen(runVoltsRoller(-8).until(combinedSensorTrigger()));
     }
 
     public Command outake() {

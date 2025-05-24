@@ -43,6 +43,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -57,8 +58,13 @@ public class RobotContainer {
     private final IntakeSubsystem intake;
     private final ElevatorSubsystem elevator;
     private final ClimberSubsystem climber;
+
+    @SuppressWarnings("unused")
     private final VisionSubsystem vision;
+
     private final LEDSubsystem leds;
+    // orchestra motors
+    // private final TalonFX orchestraMotorRollers = new TalonFX(2); // Intake rollers
 
     // Superstructure
     private final Superstructure superstructure;
@@ -217,14 +223,14 @@ public class RobotContainer {
         Command scoreLeft = Commands.runOnce(() -> side = Side.Left);
         Command scoreRight = Commands.runOnce(() -> side = Side.Right);
 
-        operatorController.y().onTrue(superstructure.setLevel(ReefLevel.L2));
+        operatorController.y().onTrue(superstructure.setLevel(ReefLevel.L4));
         operatorController.x().onTrue(superstructure.setLevel(ReefLevel.L2));
-        operatorController.b().onTrue(superstructure.setLevel(ReefLevel.L2));
+        operatorController.b().onTrue(superstructure.setLevel(ReefLevel.L3));
         operatorController.a().onTrue(superstructure.setLevel(ReefLevel.L1));
 
         operatorController.povLeft().onTrue(scoreLeft);
         operatorController.povRight().onTrue(scoreRight);
-
+        operatorController.back().onTrue(superstructure.forceState(SuperState.IDLE));
         operatorController.back().onTrue(superstructure.forceState(SuperState.IDLE));
 
         drive.setDefaultCommand(driveCommand);
@@ -238,6 +244,38 @@ public class RobotContainer {
         driveController.povDown().onTrue(climber.down());
 
         driveController.a().onTrue(superstructure.forceState(SuperState.IDLE));
+        driveController.rightBumper().onTrue(superstructure.forceState(SuperState.READY_CORAL));
+
+        driveController.y().onTrue(intake.intake());
+        // orchestra (create and add all talon motors)
+        // Orchestra canada = new Orchestra();
+        // Orchestra jazz = new Orchestra();
+
+        // canada.addInstrument(orchestraMotorRollers);
+        // jazz.addInstrument(orchestraMotorRollers);
+        // var statusCan = canada.loadMusic("canada.chrp");
+        // var statusJazz = jazz.loadMusic("jazz.chrp");
+        // System.out.println(statusJazz);
+        // System.out.println(statusCan);
+        // operatorController.rightBumper().onTrue(new InstantCommand(() -> {
+        //     if (canada.isPlaying()) {
+        //         System.out.println("Pausing O Canada");
+        //         canada.pause();
+        //     } else {
+        //         System.out.println("Playing O Canada");
+        //         canada.play();
+        //     }
+        // }));
+
+        // operatorController.leftBumper().onTrue(new InstantCommand(() -> {
+        //     if (jazz.isPlaying()) {
+        //         System.out.println("Pausing Jazz");
+        //         jazz.pause();
+        //     } else {
+        //         System.out.println("Playing Jazz");
+        //         jazz.play();
+        //     }
+        // }));
     }
 
     private void configureTuningBindings() {}
